@@ -70,7 +70,14 @@ public class AESEncrypt {
     public static byte[] decrypt(byte[] content, String password) {  
             try {  
                      KeyGenerator kgen = KeyGenerator.getInstance("AES");  
-                     kgen.init(128, new SecureRandom(password.getBytes()));  
+                     
+                     //for linux,如果不采用下面这段代码，win正常,linux产生随机安全种子，会报错
+                     //防止linux下 随机生成key 
+                     SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG" );  
+                     secureRandom.setSeed(password.getBytes());  
+                     kgen.init(128, secureRandom);  
+                     
+                     //kgen.init(128, new SecureRandom(password.getBytes()));  
                      SecretKey secretKey = kgen.generateKey();  
                      byte[] enCodeFormat = secretKey.getEncoded();  
                      SecretKeySpec key = new SecretKeySpec(enCodeFormat, "AES");              
